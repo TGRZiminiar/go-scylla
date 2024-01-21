@@ -35,13 +35,25 @@ docker exec -it scylla-node2 cqlsh
 describe users.userdata;
 ```
 
+## To test it with the api you need everything to be on the same network
+```
 
+// server image
 docker run -d --net=test-scylla_web --name some-go-app go-app
+
+// for sending api
 docker run -it --name my-ubuntu-container --network test-scylla_web ubuntu:noble-20240114
+
+// save user in db
 curl --location 'some-go-app:5000/users_v1/register' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "name":"mix1",
     "email":"mix1@gmail.com"
 }'
+
+// get users in db
 curl --location 'some-go-app:5000/users_v1/get-users'
+```
+
+
