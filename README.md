@@ -44,6 +44,12 @@ docker run -d --net=test-scylla_web --name some-go-app go-app
 // for sending api
 docker run -it --name my-ubuntu-container --network test-scylla_web ubuntu:noble-20240114
 
+// execute ubuntu
+docker exec -it my-ubuntu-container bin/bash
+apt update
+apt install -y curl
+
+
 // save user in db
 curl --location 'some-go-app:5000/users_v1/register' \
 --header 'Content-Type: application/json' \
