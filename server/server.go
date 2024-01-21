@@ -46,7 +46,7 @@ func (s *server) gracefulShutdown(pctx context.Context, quit <-chan os.Signal) {
 }
 
 func (s *server) httpListening() {
-	if err := s.app.Listen(s.cfg.App.Url); err != nil && err != http.ErrServerClosed {
+	if err := s.app.Listen(":5000"); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("Error: %v", err)
 	}
 }
@@ -56,7 +56,7 @@ func Start(pctx context.Context, cfg *config.Config, db *gocql.Session, logger *
 		db:  db,
 		cfg: cfg,
 		app: fiber.New(fiber.Config{
-			AppName:      cfg.App.Name,
+			AppName:      "testing",
 			BodyLimit:    10 * 1024 * 1024,
 			ReadTimeout:  10 * time.Second,
 			WriteTimeout: 20 * time.Second,
@@ -69,10 +69,10 @@ func Start(pctx context.Context, cfg *config.Config, db *gocql.Session, logger *
 	// Body Limit
 	// app.Settings.MaxRequestBodySize = 10 * 1024 * 1024 // 10 MB
 
-	switch s.cfg.App.Name {
-	case "users":
-		s.usersService()
-	}
+	// switch s.cfg.App.Name {
+	// case "users":
+	s.usersService()
+	// }
 
 	// s.app.Static("/asset/")
 

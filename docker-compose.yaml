@@ -1,13 +1,65 @@
-version: '3.9'
+# version: '3.9'
+# name: test-scylla
+# services:
+#   scylla-node1:
+#     container_name: scylla-node1
+#     image: scylladb/scylla:5.2.0
+#     volumes:
+#       - scylla_data:/var/lib/scylla/node-1
+#     ports:
+#       - "9042:9042"
+
+#   scylla-node2:
+#     container_name: scylla-node2
+#     image: scylladb/scylla:5.2.0
+#     volumes:
+#       - scylla_data:/var/lib/scylla/node-2
+#     ports:
+#       - "9043:9042"
+
+# volumes:
+#   scylla_data:
+version: "3"
 name: test-scylla
 services:
   scylla-node1:
-    image: scylladb/scylla:5.2
-    container_name: db-scylla
+    container_name: scylla-node1
+    image: scylladb/scylla:5.2.0
+    restart: always
+    command: --seeds=scylla-node1,scylla-node2 --smp 1 --memory 400M --overprovisioned 1 --api-address 0.0.0.0
     volumes:
-      - scylla_data:/var/lib/scylla
-    ports:
-      - "9042:9042"
+      - "./scylla/scylla.yaml:/etc/scylla/scylla.yaml"
+      - "./scylla/cassandra-rackdc.properties.dc1:/etc/scylla/cassandra-rackdc.properties"
+      - "./scylla/mutant-data.txt:/mutant-data.txt"
+      - scylla_data:/var/lib/scylla/node
+    networks:
+      web:
 
+  scylla-node2:
+    container_name: scylla-node2
+    image: scylladb/scylla:5.2.0
+    restart: always
+    command: --seeds=scylla-node1,scylla-node2 --smp 1 --memory 400M --overprovisioned 1 --api-address 0.0.0.0
+    volumes:
+      - "./scylla/scylla.yaml:/etc/scylla/scylla.yaml"
+      - "./scylla/cassandra-rackdc.properties.dc1:/etc/scylla/cassandra-rackdc.properties"
+      - scylla_data:/var/lib/scylla/node
+    networks:
+      web:
+
+  # scylla-node3:
+  #   container_name: scylla-node3
+  #   image: scylladb/scylla:5.2.0
+  #   restart: always
+  #   command: --seeds=scylla-node1,scylla-node2 --smp 1 --memory 400M --overprovisioned 1 --api-address 0.0.0.0
+  #   volumes:
+  #     - "./scylla/scylla.yaml:/etc/scylla/scylla.yaml"
+  #     - "./scylla/cassandra-rackdc.properties.dc1:/etc/scylla/cassandra-rackdc.properties"
+  #   networks:
+  #     web:
+
+networks:
+  web:
+    driver: bridge
 volumes:
   scylla_data:
