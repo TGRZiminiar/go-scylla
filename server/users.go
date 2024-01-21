@@ -12,7 +12,6 @@ func (s *server) usersService() {
 	usersHttpHandler := usershandler.NewUsersHttpHandler(s.cfg, usersUsecase)
 
 	users := s.app.Group("/users_v1")
-
 	users.Post("/register", usersHttpHandler.CreateUser)
 	users.Get("/get-users", usersHttpHandler.GetAllUsers)
 }

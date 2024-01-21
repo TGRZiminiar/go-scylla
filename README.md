@@ -1,19 +1,47 @@
+## Docker pull
+```
 docker pull scylladb/scylla:5.2
-
-docker run --name scylla-local -p 9042:9042 -d scylladb/scylla
-
+docker compose up -d
+```
 ## Show status
-docker exec -it db-scylla nodetool status
+After the setup is done you will see two node running on DC1
+```
+docker exec -it scylla-node1 nodetool status
+```
 
-## Access CQl
-docker exec -it db-scylla cqlsh
 
-users = keyspace
-CREATE KEYSPACE users WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+## Access CQl to generate some keyspace and table
+```
+docker exec -it scylla-node1 cqlsh
+```
 
+## Create datacenter and initial table
+// users = keyspace
+```
+CREATE KEYSPACE users WITH REPLICATION = { 'class' : 'NetworkTopologyStrategy','DC1' : 3};
+use users;
 CREATE TABLE IF NOT EXISTS users.userData (
     id UUID PRIMARY KEY,
     name TEXT,
     email TEXT
 );
-<!-- insert into userData ("first_name","last_name","address","picture_location") VALUES ('Bob','Loblaw','1313 Mockingbird Lane', 'http://www.facebook.com/bobloblaw'); -->
+describe users.userdata;
+```
+
+## Check that datacenter is working
+If the data of the tables users show that mean datacenter work
+```
+docker exec -it scylla-node2 cqlsh
+describe users.userdata;
+```
+
+
+docker run -d --net=test-scylla_web --name some-go-app go-app
+docker run -it --name my-ubuntu-container --network test-scylla_web ubuntu:noble-20240114
+curl --location 'some-go-app:5000/users_v1/register' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name":"mix1",
+    "email":"mix1@gmail.com"
+}'
+curl --location 'some-go-app:5000/users_v1/get-users'
