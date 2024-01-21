@@ -1,0 +1,13 @@
+version: '3.9'
+name: test-scylla
+services:
+  scylla-node1:
+    image: scylladb/scylla:5.2
+    container_name: db-scylla
+    volumes:
+      - scylla_data:/var/lib/scylla
+    ports:
+      - "9042:9042"
+
+volumes:
+  scylla_data:
